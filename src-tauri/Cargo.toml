@@ -10,6 +10,8 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+sysinfo = "0.30"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
