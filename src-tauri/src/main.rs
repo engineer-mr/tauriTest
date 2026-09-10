@@ -13,7 +13,12 @@ fn system_info() -> SystemInfo {
   let mut system = System::new_all();
   system.refresh_all();
 
-  let name = System::name().unwrap_or_else(|| std::env::consts::OS.to_string());
+  // sysinfo reports the Darwin kernel name on macOS; show the platform name users expect.
+  let name = if cfg!(target_os = "macos") {
+    "macOS".to_string()
+  } else {
+    System::name().unwrap_or_else(|| std::env::consts::OS.to_string())
+  };
   let version = System::os_version().unwrap_or_default();
   let system_name = if version.is_empty() { name } else { format!("{name} {version}") };
   let cpu = system.cpus().first()
