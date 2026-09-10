@@ -1,0 +1,73 @@
+name: 'build-tauri'
+
+# 触发方式：
+# 1) 推送 v 开头的 tag，例如 git tag v1.0.0 && git push --tags
+# 2) 或手动：仓库 Actions 页面 -> 选中本 workflow -> Run workflow
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS（Apple Silicon，M 系列芯片）
+          - platform: 'macos-latest'
+            args: '--target aarch64-apple-darwin'
+            rust-targets: 'aarch64-apple-darwin'
+          # macOS（Intel）
+          - platform: 'macos-latest'
+            args: '--target x86_64-apple-darwin'
+            rust-targets: 'x86_64-apple-darwin'
+          # Linux（deb / AppImage）
+          - platform: 'ubuntu-22.04'
+            args: ''
+            rust-targets: ''
+          # Windows（NSIS 安装包 / MSI）
+          - platform: 'windows-latest'
+            args: ''
+            rust-targets: ''
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-targets }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'tauriTest v__VERSION__'
+          releaseBody: 'tauriTest 自动构建安装包，请按平台下载对应文件。'
+          releaseDraft: true
+          prerelease: false
