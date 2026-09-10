@@ -1,0 +1,15 @@
+[package]
+name = "my-react-app"
+version = "0.0.0"
+description = "my-react-app"
+authors = ["Mr.Li"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+
+[features]
+custom-protocol = ["tauri/custom-protocol"]
