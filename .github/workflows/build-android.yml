@@ -52,7 +52,10 @@ jobs:
             ${{ runner.os }}-android-
 
       - name: Install frontend dependencies
-        run: npm ci
+        run: npm ci --include=optional
+
+      - name: Install Rollup Linux native dependency
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu@4.57.1
 
       - name: Initialize Tauri Android project
         run: npx tauri android init --ci
