@@ -46,7 +46,6 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             src-tauri/target
-            src-tauri/gen/android/.gradle
           key: ${{ runner.os }}-android-${{ hashFiles('**/Cargo.lock', '**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-android-
@@ -56,6 +55,9 @@ jobs:
 
       - name: Install Rollup Linux native dependency
         run: npm install --no-save @rollup/rollup-linux-x64-gnu@4.57.1
+
+      - name: Clean previous Android project
+        run: rm -rf src-tauri/gen/android
 
       - name: Initialize Tauri Android project
         run: npx tauri android init --ci
