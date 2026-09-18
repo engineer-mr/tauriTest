@@ -70,6 +70,9 @@ jobs:
           base64 -d <<< "${{ secrets.ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
           echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
 
+      - name: Configure Gradle release signing
+        run: python3 .github/android-signing-patch.py
+
       - name: Build APK and AAB
         run: npx tauri android build --ci --apk --aab
 
