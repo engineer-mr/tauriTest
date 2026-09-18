@@ -61,7 +61,7 @@ jobs:
         run: npx tauri android init --ci
 
       - name: Build APK and AAB
-        run: npx tauri android build --ci --apk --aab
+        run: npx tauri android build --ci --apk --aab --debug
 
       - name: Upload Android packages
         uses: actions/upload-artifact@v4
